@@ -1,0 +1,9 @@
+{
+	"name": "cdsds598hwdfak",
+	"location": "eastus2",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "2fe42700-f7a9-4ce9-ab59-c64b2f247f96",
+		"tenantId": "d57d32cc-c121-488f-b07b-dfe705680c71"
+	}
+}
