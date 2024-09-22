@@ -1,0 +1,23 @@
+{
+	"name": "OpenWeatherPoll",
+	"properties": {
+		"description": "Open Weather Pollution API",
+		"annotations": [],
+		"type": "HttpServer",
+		"typeProperties": {
+			"url": "http://api.openweathermap.org/",
+			"enableServerCertificateValidation": false,
+			"authenticationType": "Anonymous",
+			"authHeaders": {
+				"APIKey": {
+					"type": "AzureKeyVaultSecret",
+					"store": {
+						"referenceName": "AzureKeyVault1",
+						"type": "LinkedServiceReference"
+					},
+					"secretName": "OWAPIKEY"
+				}
+			}
+		}
+	}
+}
