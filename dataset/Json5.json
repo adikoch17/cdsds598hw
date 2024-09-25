@@ -8,11 +8,11 @@
 		"parameters": {
 			"Start": {
 				"type": "String",
-				"defaultValue": "@pipeline().parameters.Start_time"
+				"defaultValue": "@variables('Start')"
 			},
 			"End": {
 				"type": "String",
-				"defaultValue": "@pipelines().parameters.Curr_time"
+				"defaultValue": "@variables('Curr')"
 			},
 			"API": {
 				"type": "String",
