@@ -5,12 +5,21 @@
 			"referenceName": "OpenWeatherHist",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"APIKEY_PARAM": {
+				"type": "String",
+				"defaultValue": "@variables('API')"
+			}
+		},
 		"annotations": [],
 		"type": "Json",
 		"typeProperties": {
 			"location": {
 				"type": "HttpServerLocation",
-				"relativeUrl": "data/2.5/history/city?lat=41.85&lon=-87.65&appid=@{activity('Fetch_api').output.value}"
+				"relativeUrl": {
+					"value": "data/2.5/history/city?lat=41.85&lon=-87.65&appid=@{dataset().APIKEY_PARAM}",
+					"type": "Expression"
+				}
 			}
 		},
 		"schema": {}

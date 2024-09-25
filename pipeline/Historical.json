@@ -28,9 +28,9 @@
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Fetch_api",
+						"activity": "SetAPI",
 						"dependencyConditions": [
-							"Completed"
+							"Succeeded"
 						]
 					}
 				],
@@ -54,7 +54,12 @@
 								"secureOutput": false,
 								"secureInput": false
 							},
-							"userProperties": [],
+							"userProperties": [
+								{
+									"name": "APIKEY",
+									"value": "@activity('Fetch_api').output.value"
+								}
+							],
 							"typeProperties": {
 								"source": {
 									"type": "JsonSource",
@@ -80,7 +85,13 @@
 							"inputs": [
 								{
 									"referenceName": "Json1",
-									"type": "DatasetReference"
+									"type": "DatasetReference",
+									"parameters": {
+										"APIKEY_PARAM": {
+											"value": "@variables('API')",
+											"type": "Expression"
+										}
+									}
 								}
 							],
 							"outputs": [
@@ -89,25 +100,32 @@
 									"type": "DatasetReference"
 								}
 							]
-						},
-						{
-							"name": "Set variable1",
-							"type": "SetVariable",
-							"dependsOn": [
-								{
-									"activity": "Copy data1",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": []
 						}
 					]
+				}
+			},
+			{
+				"name": "SetAPI",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Fetch_api",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "API",
+					"value": {
+						"value": "@activity('Fetch_api').output",
+						"type": "Expression"
+					}
 				}
 			}
 		],
@@ -119,6 +137,10 @@
 			"End_time": {
 				"type": "String",
 				"defaultValue": "1727064000"
+			},
+			"API": {
+				"type": "String",
+				"defaultValue": "value"
 			}
 		},
 		"annotations": []
