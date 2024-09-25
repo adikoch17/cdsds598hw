@@ -70,7 +70,10 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"Start": "@pipeline().parameters.Start_time",
-							"End": "@pipelines().parameters.Curr_time",
+							"End": {
+								"value": "@pipeline().parameters.Curr_time",
+								"type": "Expression"
+							},
 							"API": "@activity('Fetch_api').output.value"
 						}
 					}
