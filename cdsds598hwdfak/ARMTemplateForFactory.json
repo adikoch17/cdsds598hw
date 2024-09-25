@@ -82,7 +82,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"expression": {
-								"value": "@greaterOrEquals(int(pipeline().parameters.Curr_time),int(variables('End_time')))",
+								"value": "@greaterOrEquals(int(variables('End_time')),int(pipeline().parameters.Curr_time))",
 								"type": "Expression"
 							},
 							"activities": [
@@ -233,7 +233,7 @@
 					},
 					"week_increment": {
 						"type": "string",
-						"defaultValue": "604800"
+						"defaultValue": "604799"
 					}
 				},
 				"variables": {
