@@ -1,0 +1,98 @@
+{
+	"name": "Pollution",
+	"properties": {
+		"activities": [
+			{
+				"name": "Fetch_api",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "GET",
+					"url": "https://opwapikey.vault.azure.net/secrets/OWAPIKEY/cea7dedf48c04bb99455798ba5a72532?api-version=7.0",
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://vault.azure.net/"
+					}
+				}
+			},
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Fetch_api",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "JsonSource",
+						"storeSettings": {
+							"type": "HttpReadSettings",
+							"requestMethod": "GET"
+						},
+						"formatSettings": {
+							"type": "JsonReadSettings"
+						}
+					},
+					"sink": {
+						"type": "JsonSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "JsonWriteSettings"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "Json5",
+						"type": "DatasetReference",
+						"parameters": {
+							"Start": "@pipeline().parameters.Start_time",
+							"End": "@pipelines().parameters.Curr_time",
+							"API": "@activity('Fetch_api').output.value"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "Json6",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"parameters": {
+			"Start_time": {
+				"type": "string",
+				"defaultValue": "1698033600"
+			},
+			"Curr_time": {
+				"type": "string",
+				"defaultValue": "1727064000"
+			}
+		},
+		"annotations": []
+	}
+}

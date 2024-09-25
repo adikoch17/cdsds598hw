@@ -1,0 +1,35 @@
+{
+	"name": "Json5",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "OpenWeatherPoll",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"Start": {
+				"type": "String",
+				"defaultValue": "@pipeline().parameters.Start_time"
+			},
+			"End": {
+				"type": "String",
+				"defaultValue": "@pipelines().parameters.Curr_time"
+			},
+			"API": {
+				"type": "String",
+				"defaultValue": "@activity('Fetch_api').output.value"
+			}
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": {
+					"value": "data/2.5/air_pollution/history?lat=42.36&lon=-71.05&type=hour&start=@{string(dataset().Start)}&end=@{string(dataset().End)}&appid=@{dataset().API}\n\n\n\n",
+					"type": "Expression"
+				}
+			}
+		},
+		"schema": {}
+	}
+}

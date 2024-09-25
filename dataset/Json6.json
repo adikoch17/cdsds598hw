@@ -1,5 +1,5 @@
 {
-	"name": "Json2",
+	"name": "Json6",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "AzureDataLakeStorage1",
@@ -10,7 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"folderPath": "Bronze/Historical",
+				"folderPath": "Bronze/Pollution",
 				"fileSystem": "cdsds598dlhwak"
 			}
 		},
