@@ -8,7 +8,7 @@
 		"parameters": {
 			"API": {
 				"type": "String",
-				"defaultValue": "@variables('APIKEY')"
+				"defaultValue": "@activity('Fetch_api').output.value"
 			},
 			"Start": {
 				"type": "String",
