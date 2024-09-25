@@ -1,0 +1,247 @@
+{
+	"name": "Historical",
+	"properties": {
+		"activities": [
+			{
+				"name": "Fetch_api",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "GET",
+					"url": "https://opwapikey.vault.azure.net/secrets/OWAPIKEY/cea7dedf48c04bb99455798ba5a72532?api-version=7.0",
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://vault.azure.net/"
+					}
+				}
+			},
+			{
+				"name": "Hourly",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Until_weeks",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@variables('weeks')",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Copy data1",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [
+								{
+									"name": "APIKEY",
+									"value": "@activity('Fetch_api').output.value"
+								}
+							],
+							"typeProperties": {
+								"source": {
+									"type": "JsonSource",
+									"storeSettings": {
+										"type": "HttpReadSettings",
+										"requestMethod": "GET"
+									},
+									"formatSettings": {
+										"type": "JsonReadSettings"
+									}
+								},
+								"sink": {
+									"type": "JsonSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "JsonWriteSettings"
+									}
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "Json1",
+									"type": "DatasetReference",
+									"parameters": {
+										"APIKEY_PARAM": {
+											"value": "@variables('API')",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "Json2",
+									"type": "DatasetReference"
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"name": "SetAPI",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Fetch_api",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "API",
+					"value": {
+						"value": "@activity('Fetch_api').output",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Until_weeks",
+				"type": "Until",
+				"dependsOn": [
+					{
+						"activity": "SetAPI",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@greaterOrEquals(pipeline().parameters.Curr_time,int(variables('End_time')))",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Append_timestamp",
+							"type": "AppendVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "weeks",
+								"value": {
+									"value": "@[variables('Start_time'),variables('End_time')]",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Increment_Start",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Append_timestamp",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "Start_time",
+								"value": {
+									"value": "@string(add(int(variables('End_time')),1))",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Increment_End",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Increment_Start",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "End_time",
+								"value": {
+									"value": "@int(add(int(variables('Start_time')),pipeline().parameters.week_increment))",
+									"type": "Expression"
+								}
+							}
+						}
+					],
+					"timeout": "0.12:00:00"
+				}
+			}
+		],
+		"parameters": {
+			"Start_time": {
+				"type": "int",
+				"defaultValue": 1698033600
+			},
+			"Curr_time": {
+				"type": "int",
+				"defaultValue": 1727064000
+			},
+			"week_increment": {
+				"type": "int",
+				"defaultValue": 604800
+			}
+		},
+		"variables": {
+			"Start_time": {
+				"type": "Integer",
+				"defaultValue": 1698033600
+			},
+			"End_time": {
+				"type": "Integer",
+				"defaultValue": 1698638400
+			},
+			"API": {
+				"type": "String",
+				"defaultValue": "value"
+			},
+			"weeks": {
+				"type": "Array"
+			}
+		},
+		"annotations": []
+	}
+}
