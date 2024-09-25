@@ -286,7 +286,7 @@
 						}
 					},
 					{
-						"name": "Copy data1",
+						"name": "Copy data1_copy1",
 						"type": "Copy",
 						"dependsOn": [
 							{
@@ -331,9 +331,12 @@
 								"referenceName": "Json5",
 								"type": "DatasetReference",
 								"parameters": {
-									"Start": "@pipeline().parameters.Start_time",
+									"Start": {
+										"value": "@variables('Start')",
+										"type": "Expression"
+									},
 									"End": {
-										"value": "@pipeline().parameters.Curr_time",
+										"value": "@variables('Curr')",
 										"type": "Expression"
 									},
 									"API": "@activity('Fetch_api').output.value"
@@ -352,13 +355,13 @@
 				"policy": {
 					"elapsedTimeMetric": {}
 				},
-				"parameters": {
-					"Start_time": {
-						"type": "string",
+				"variables": {
+					"Start": {
+						"type": "String",
 						"defaultValue": "1698033600"
 					},
-					"Curr_time": {
-						"type": "string",
+					"Curr": {
+						"type": "String",
 						"defaultValue": "1727064000"
 					}
 				},
@@ -445,11 +448,11 @@
 				"parameters": {
 					"Start": {
 						"type": "String",
-						"defaultValue": "@pipeline().parameters.Start_time"
+						"defaultValue": "@variables('Start')"
 					},
 					"End": {
 						"type": "String",
-						"defaultValue": "@pipelines().parameters.Curr_time"
+						"defaultValue": "@variables('Curr')"
 					},
 					"API": {
 						"type": "String",
