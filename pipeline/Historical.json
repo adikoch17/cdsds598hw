@@ -28,19 +28,18 @@
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "SetAPI",
+						"activity": "Until_weeks",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
 						]
 					}
 				],
-				"userProperties": [
-					{
-						"name": "APIKEY",
-						"value": ""
-					}
-				],
+				"userProperties": [],
 				"typeProperties": {
+					"items": {
+						"value": "@variables('weeks')",
+						"type": "Expression"
+					},
 					"isSequential": true,
 					"activities": [
 						{
@@ -127,20 +126,120 @@
 						"type": "Expression"
 					}
 				}
+			},
+			{
+				"name": "Until_weeks",
+				"type": "Until",
+				"dependsOn": [
+					{
+						"activity": "SetAPI",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@greaterOrEquals(pipeline().parameters.Curr_time,int(variables('End_time')))",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Append_timestamp",
+							"type": "AppendVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "weeks",
+								"value": {
+									"value": "@[variables('Start_time'),variables('End_time')]",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Increment_Start",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Append_timestamp",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "Start_time",
+								"value": {
+									"value": "@string(add(int(variables('End_time')),1))",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Increment_End",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Increment_Start",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "End_time",
+								"value": {
+									"value": "@int(add(int(variables('Start_time')),pipeline().parameters.week_increment))",
+									"type": "Expression"
+								}
+							}
+						}
+					],
+					"timeout": "0.12:00:00"
+				}
 			}
 		],
+		"parameters": {
+			"Start_time": {
+				"type": "int",
+				"defaultValue": 1698033600
+			},
+			"Curr_time": {
+				"type": "int",
+				"defaultValue": 1727064000
+			},
+			"week_increment": {
+				"type": "int",
+				"defaultValue": 604800
+			}
+		},
 		"variables": {
 			"Start_time": {
-				"type": "String",
-				"defaultValue": "1698033600"
+				"type": "Integer",
+				"defaultValue": 1698033600
 			},
 			"End_time": {
-				"type": "String",
-				"defaultValue": "1727064000"
+				"type": "Integer",
+				"defaultValue": 1698638400
 			},
 			"API": {
 				"type": "String",
 				"defaultValue": "value"
+			},
+			"weeks": {
+				"type": "Array"
 			}
 		},
 		"annotations": []
