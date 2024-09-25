@@ -9,6 +9,14 @@
 			"APIKEY_PARAM": {
 				"type": "String",
 				"defaultValue": "@variables('API')"
+			},
+			"Start": {
+				"type": "String",
+				"defaultValue": "@item()[0]"
+			},
+			"End": {
+				"type": "String",
+				"defaultValue": "@string(item()[1])"
 			}
 		},
 		"annotations": [],
@@ -17,7 +25,7 @@
 			"location": {
 				"type": "HttpServerLocation",
 				"relativeUrl": {
-					"value": "data/2.5/history/city?lat=41.85&lon=-87.65&appid=@{dataset().APIKEY_PARAM}",
+					"value": "data/2.5/history/city?lat=41.85&type=hour&start=@{dataset().Start}&end=@{dataset().End}&lon=-87.65&appid=@{dataset().APIKEY_PARAM}",
 					"type": "Expression"
 				}
 			}
