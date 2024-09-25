@@ -1,0 +1,57 @@
+{
+	"name": "Historical",
+	"properties": {
+		"activities": [
+			{
+				"name": "Fetch_api",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "GET",
+					"url": "https://opwapikey.vault.azure.net/secrets/OWAPIKEY/cea7dedf48c04bb99455798ba5a72532?api-version=7.0",
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://vault.azure.net/"
+					}
+				}
+			},
+			{
+				"name": "Fetch_Historical_Data",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "GET",
+					"headers": {
+						"Content-type": "application/json"
+					},
+					"url": {
+						"value": "https://history.openweathermap.org/data/2.5/history/city?lat=41.85&lon=-87.65&appid=@{activity('Fetch_api').output.value}",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"variables": {
+			"Temp_value": {
+				"type": "String"
+			}
+		},
+		"annotations": []
+	}
+}
