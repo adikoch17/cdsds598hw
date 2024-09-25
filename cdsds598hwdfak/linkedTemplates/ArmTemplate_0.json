@@ -89,7 +89,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Json2')]",
+			"name": "[concat(parameters('factoryName'), '/Json4')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -113,7 +113,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Json4')]",
+			"name": "[concat(parameters('factoryName'), '/Json6')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -126,7 +126,7 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
-						"folderPath": "Bronze/Historical",
+						"folderPath": "Bronze/Pollution",
 						"fileSystem": "cdsds598dlhwak"
 					}
 				},
@@ -193,46 +193,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Json1')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "OpenWeatherHist",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"APIKEY_PARAM": {
-						"type": "String",
-						"defaultValue": "@variables('API')"
-					},
-					"Start": {
-						"type": "String",
-						"defaultValue": "@item()[0]"
-					},
-					"End": {
-						"type": "String",
-						"defaultValue": "@string(item()[1])"
-					}
-				},
-				"annotations": [],
-				"type": "Json",
-				"typeProperties": {
-					"location": {
-						"type": "HttpServerLocation",
-						"relativeUrl": {
-							"value": "data/2.5/history/city?lat=41.85&type=hour&start=@{dataset().Start}&end=@{dataset().End}&lon=-87.65&appid=@{dataset().APIKEY_PARAM}",
-							"type": "Expression"
-						}
-					}
-				},
-				"schema": {}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/OpenWeatherHist')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/Json3')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -270,6 +230,46 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/OpenWeatherHist')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Json5')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "OpenWeatherPoll",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"Start": {
+						"type": "String",
+						"defaultValue": "@pipeline().parameters.Start_time"
+					},
+					"End": {
+						"type": "String",
+						"defaultValue": "@pipelines().parameters.Curr_time"
+					},
+					"API": {
+						"type": "String",
+						"defaultValue": "@activity('Fetch_api').output.value"
+					}
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "HttpServerLocation",
+						"relativeUrl": {
+							"value": "data/2.5/air_pollution/history?lat=42.36&lon=-71.05&type=hour&start=@{string(dataset().Start)}&end=@{string(dataset().End)}&appid=@{dataset().API}\n\n\n\n",
+							"type": "Expression"
+						}
+					}
+				},
+				"schema": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/OpenWeatherPoll')]"
 			]
 		},
 		{
@@ -487,6 +487,115 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/Json3')]",
 				"[concat(variables('factoryId'), '/datasets/Json4')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Pollution')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Fetch_api",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "GET",
+							"headers": {},
+							"url": "https://opwapikey.vault.azure.net/secrets/OWAPIKEY/cea7dedf48c04bb99455798ba5a72532?api-version=7.0",
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://vault.azure.net/"
+							}
+						}
+					},
+					{
+						"name": "Copy data1",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Fetch_api",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "JsonSource",
+								"storeSettings": {
+									"type": "HttpReadSettings",
+									"requestMethod": "GET"
+								},
+								"formatSettings": {
+									"type": "JsonReadSettings"
+								}
+							},
+							"sink": {
+								"type": "JsonSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "JsonWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "Json5",
+								"type": "DatasetReference",
+								"parameters": {
+									"Start": "@pipeline().parameters.Start_time",
+									"End": "@pipelines().parameters.Curr_time",
+									"API": "@activity('Fetch_api').output.value"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "Json6",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"Start_time": {
+						"type": "string",
+						"defaultValue": "1698033600"
+					},
+					"Curr_time": {
+						"type": "string",
+						"defaultValue": "1727064000"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/Json5')]",
+				"[concat(variables('factoryId'), '/datasets/Json6')]"
 			]
 		}
 	]
