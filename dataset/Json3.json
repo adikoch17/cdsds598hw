@@ -1,0 +1,35 @@
+{
+	"name": "Json3",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "OpenWeatherHist",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"API": {
+				"type": "String",
+				"defaultValue": "@variables('APIKEY')"
+			},
+			"Start": {
+				"type": "String",
+				"defaultValue": "@variables('Start_time')"
+			},
+			"End": {
+				"type": "String",
+				"defaultValue": "@variables('End_time')"
+			}
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": {
+					"value": "data/2.5/history/city?lat=42.36&lon=-71.05&type=hour&start=@{string(dataset().Start)}&end=@{string(dataset().End)}&appid=@{dataset().API}\n\n\n",
+					"type": "Expression"
+				}
+			}
+		},
+		"schema": {}
+	}
+}

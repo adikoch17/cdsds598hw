@@ -26,14 +26,9 @@
 			{
 				"name": "Hourly",
 				"type": "ForEach",
-				"dependsOn": [
-					{
-						"activity": "Until_weeks",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
@@ -79,113 +74,7 @@
 										"type": "JsonWriteSettings"
 									}
 								},
-								"enableStaging": false,
-								"translator": {
-									"type": "TabularTranslator",
-									"mappings": [
-										{
-											"source": {
-												"path": "$['message']"
-											}
-										},
-										{
-											"source": {
-												"path": "$['cod']"
-											}
-										},
-										{
-											"source": {
-												"path": "$['city_id']"
-											}
-										},
-										{
-											"source": {
-												"path": "$['calctime']"
-											}
-										},
-										{
-											"source": {
-												"path": "$['cnt']"
-											}
-										},
-										{
-											"source": {
-												"path": "$['list'][0]['dt']"
-											}
-										},
-										{
-											"source": {
-												"path": "$['list'][0]['main']['temp']"
-											}
-										},
-										{
-											"source": {
-												"path": "$['list'][0]['main']['feels_like']"
-											}
-										},
-										{
-											"source": {
-												"path": "$['list'][0]['main']['pressure']"
-											}
-										},
-										{
-											"source": {
-												"path": "$['list'][0]['main']['humidity']"
-											}
-										},
-										{
-											"source": {
-												"path": "$['list'][0]['main']['temp_min']"
-											}
-										},
-										{
-											"source": {
-												"path": "$['list'][0]['main']['temp_max']"
-											}
-										},
-										{
-											"source": {
-												"path": "$['list'][0]['wind']['speed']"
-											}
-										},
-										{
-											"source": {
-												"path": "$['list'][0]['wind']['deg']"
-											}
-										},
-										{
-											"source": {
-												"path": "$['list'][0]['wind']['gust']"
-											}
-										},
-										{
-											"source": {
-												"path": "$['list'][0]['clouds']['all']"
-											}
-										},
-										{
-											"source": {
-												"path": "$['list'][0]['weather'][0]['id']"
-											}
-										},
-										{
-											"source": {
-												"path": "$['list'][0]['weather'][0]['main']"
-											}
-										},
-										{
-											"source": {
-												"path": "$['list'][0]['weather'][0]['description']"
-											}
-										},
-										{
-											"source": {
-												"path": "$['list'][0]['weather'][0]['icon']"
-											}
-										}
-									],
-									"collectionReference": ""
-								}
+								"enableStaging": false
 							},
 							"inputs": [
 								{
@@ -255,6 +144,8 @@
 						{
 							"name": "Append_timestamp",
 							"type": "AppendVariable",
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
 							"dependsOn": [],
 							"userProperties": [],
 							"typeProperties": {
@@ -270,7 +161,7 @@
 							"type": "SetVariable",
 							"dependsOn": [
 								{
-									"activity": "Append_timestamp",
+									"activity": "Copy data2",
 									"dependencyConditions": [
 										"Completed"
 									]
@@ -312,6 +203,70 @@
 									"type": "Expression"
 								}
 							}
+						},
+						{
+							"name": "Copy data2",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.00:10:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [
+								{
+									"name": "Source",
+									"value": "data/2.5/history/city?lat=42.36&lon=-71.05&type=hour&start=@{string(variables('Start_time'))}&end=@{string(variables('End_time'))}&appid=@{variables('API')}\n\n\n"
+								},
+								{
+									"name": "Destination",
+									"value": "cdsds598dlhwak/Bronze/Historical/"
+								}
+							],
+							"typeProperties": {
+								"source": {
+									"type": "JsonSource",
+									"storeSettings": {
+										"type": "HttpReadSettings",
+										"requestMethod": "GET"
+									},
+									"formatSettings": {
+										"type": "JsonReadSettings"
+									}
+								},
+								"sink": {
+									"type": "JsonSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "JsonWriteSettings"
+									}
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "Json3",
+									"type": "DatasetReference",
+									"parameters": {
+										"API": {
+											"value": "@variables('API')",
+											"type": "Expression"
+										},
+										"Start": "@variables('Start_time')",
+										"End": "@variables('End_time')"
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "Json4",
+									"type": "DatasetReference"
+								}
+							]
 						}
 					],
 					"timeout": "0.12:00:00"
