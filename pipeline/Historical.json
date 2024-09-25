@@ -24,32 +24,101 @@
 				}
 			},
 			{
-				"name": "Fetch_Historical_Data",
-				"type": "WebActivity",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": true
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"method": "GET",
-					"headers": {
-						"Content-type": "application/json"
-					},
-					"url": {
-						"value": "https://history.openweathermap.org/data/2.5/history/city?lat=41.85&lon=-87.65&appid=@{activity('Fetch_api').output.value}",
-						"type": "Expression"
+				"name": "Hourly",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Fetch_api",
+						"dependencyConditions": [
+							"Completed"
+						]
 					}
+				],
+				"userProperties": [
+					{
+						"name": "APIKEY",
+						"value": ""
+					}
+				],
+				"typeProperties": {
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Copy data1",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "JsonSource",
+									"storeSettings": {
+										"type": "HttpReadSettings",
+										"requestMethod": "GET"
+									},
+									"formatSettings": {
+										"type": "JsonReadSettings"
+									}
+								},
+								"sink": {
+									"type": "JsonSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "JsonWriteSettings"
+									}
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "Json1",
+									"type": "DatasetReference"
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "Json2",
+									"type": "DatasetReference"
+								}
+							]
+						},
+						{
+							"name": "Set variable1",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Copy data1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": []
+						}
+					]
 				}
 			}
 		],
 		"variables": {
-			"Temp_value": {
-				"type": "String"
+			"Start_time": {
+				"type": "String",
+				"defaultValue": "1698033600"
+			},
+			"End_time": {
+				"type": "String",
+				"defaultValue": "1727064000"
 			}
 		},
 		"annotations": []

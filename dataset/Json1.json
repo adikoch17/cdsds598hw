@@ -1,0 +1,18 @@
+{
+	"name": "Json1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "OpenWeatherHist",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": "data/2.5/history/city?lat=41.85&lon=-87.65&appid=@{activity('Fetch_api').output.value}"
+			}
+		},
+		"schema": {}
+	}
+}
