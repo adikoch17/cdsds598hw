@@ -85,7 +85,8 @@
 											"value": "@variables('API')",
 											"type": "Expression"
 										},
-										"Start": "@item()[0]"
+										"Start": "@item()[0]",
+										"End": "@string(item()[1])"
 									}
 								}
 							],
@@ -137,7 +138,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"expression": {
-						"value": "@greaterOrEquals(pipeline().parameters.Curr_time,int(variables('End_time')))",
+						"value": "@greaterOrEquals(int(pipeline().parameters.Curr_time),int(variables('End_time')))",
 						"type": "Expression"
 					},
 					"activities": [
@@ -199,7 +200,7 @@
 							"typeProperties": {
 								"variableName": "End_time",
 								"value": {
-									"value": "@int(add(int(variables('Start_time')),pipeline().parameters.week_increment))",
+									"value": "@string(add(int(variables('Start_time')),int(pipeline().parameters.week_increment)))",
 									"type": "Expression"
 								}
 							}
@@ -253,7 +254,7 @@
 									"type": "DatasetReference",
 									"parameters": {
 										"API": {
-											"value": "@variables('API')",
+											"value": "@activity('Fetch_api').output",
 											"type": "Expression"
 										},
 										"Start": "@variables('Start_time')",
@@ -275,33 +276,34 @@
 		],
 		"parameters": {
 			"Start_time": {
-				"type": "int",
-				"defaultValue": 1698033600
+				"type": "string",
+				"defaultValue": "1698033600"
 			},
 			"Curr_time": {
-				"type": "int",
-				"defaultValue": 1727064000
+				"type": "string",
+				"defaultValue": "1727064000"
 			},
 			"week_increment": {
-				"type": "int",
-				"defaultValue": 604800
+				"type": "string",
+				"defaultValue": "604800"
 			}
 		},
 		"variables": {
 			"Start_time": {
-				"type": "Integer",
-				"defaultValue": 1698033600
+				"type": "String",
+				"defaultValue": "1698033600"
 			},
 			"End_time": {
-				"type": "Integer",
-				"defaultValue": 1698638400
+				"type": "String",
+				"defaultValue": "1698638400"
 			},
 			"API": {
 				"type": "String",
 				"defaultValue": "value"
 			},
 			"weeks": {
-				"type": "Array"
+				"type": "Array",
+				"defaultValue": []
 			}
 		},
 		"annotations": []
