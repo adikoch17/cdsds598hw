@@ -16,6 +16,15 @@
 			"transformations": [
 				{
 					"name": "flatten1"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "derivedColumn2"
 				}
 			],
 			"scriptLines": [
@@ -33,7 +42,12 @@
 				"     documentForm: 'documentPerLine') ~> source1",
 				"source1 foldDown(unroll(),",
 				"     mapColumn(",
-				"          dt = list.dt,",
+				"          message,",
+				"          cod,",
+				"          city_id,",
+				"          cnt,",
+				"          calctime,",
+				"          timestamp = list.dt,",
 				"          temp = list.main.temp,",
 				"          feels_like = list.main.feels_like,",
 				"          pressure = list.main.pressure,",
@@ -43,10 +57,27 @@
 				"          wind_speed = list.wind.speed,",
 				"          wind_deg = list.wind.deg,",
 				"          cloud_coverage = list.clouds.all,",
-				"          cloud_description = list.weather.description",
+				"          weather_description = list.weather.description,",
+				"          weather_id = list.weather.id,",
+				"          weather_main = list.weather.main,",
+				"          weather_icon = list.weather.icon",
 				"     ),",
 				"     skipDuplicateMapInputs: false,",
-				"     skipDuplicateMapOutputs: false) ~> flatten1"
+				"     skipDuplicateMapOutputs: false) ~> flatten1",
+				"flatten1 derive(corrected_timestamp = iif(length(toString(timestamp)) > 10, toInteger(null()), toInteger(timestamp)),",
+				"          location = 'Boston') ~> derivedColumn1",
+				"derivedColumn1 filter(!isNull(temp) && !isNull(humidity) && !isNull(corrected_timestamp)) ~> filter1",
+				"filter1 derive(date_time = toTimestamp(toLong(corrected_timestamp) * 1000),",
+				"          id = concat(location, '_', toString(corrected_timestamp)),",
+				"          temp_c = round(temp - 273.15, 2),",
+				"          temp_f = round((temp - 273.15) * 9/5 + 32, 2),",
+				"          temp_min_c = round(temp_min - 273.15, 2),",
+				"          temp_max_c = round(temp_max - 273.15, 2),",
+				"          temp_min_f = round((temp_min - 273.15) * 9/5 + 32, 2),",
+				"          temp_max_f = round((temp_max - 273.15) * 9/5 + 32, 2),",
+				"          lat = 42.3601,",
+				"          lon = -71.0589,",
+				"          column1 = ERROR_FUNCTION('')) ~> derivedColumn2"
 			]
 		}
 	}
