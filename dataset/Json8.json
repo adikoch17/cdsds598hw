@@ -1,0 +1,19 @@
+{
+	"name": "Json8",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "Bronze/Pollution/data/2.5/air_pollution",
+				"fileSystem": "cdsds598dlhwak"
+			}
+		},
+		"schema": {}
+	}
+}
