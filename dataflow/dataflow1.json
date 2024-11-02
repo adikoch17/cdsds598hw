@@ -51,7 +51,7 @@
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false,",
 				"     documentForm: 'documentPerLine',",
-				"     wildcardPaths:[('cdsds598dlhwak/Bronze/Historical/data/2.5/history/*')]) ~> source1",
+				"     wildcardPaths:[('Bronze/Historical/data/2.5/history/*')]) ~> source1",
 				"source1 foldDown(unroll(),",
 				"     mapColumn(",
 				"          message,",
