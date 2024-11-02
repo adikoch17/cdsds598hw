@@ -47,7 +47,7 @@
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false,",
 				"     documentForm: 'documentPerLine',",
-				"     wildcardPaths:[('cdsds598dlhwak/Bronze/Pollution/data/2.5/air_pollution/*')]) ~> source1",
+				"     wildcardPaths:[('Bronze/Pollution/data/2.5/air_pollution/*')]) ~> source1",
 				"source1 foldDown(unroll(),",
 				"     mapColumn(",
 				"          lat = coord.lat,",
