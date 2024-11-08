@@ -598,7 +598,7 @@
 						"select1 sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     format: 'parquet',",
-						"     partitionFileNames:['Processed_historical_weather.json'],",
+						"     partitionFileNames:['Processed_historical_weather'],",
 						"     umask: 0022,",
 						"     preCommands: [],",
 						"     postCommands: [],",
